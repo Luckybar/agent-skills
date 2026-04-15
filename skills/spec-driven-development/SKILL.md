@@ -50,7 +50,7 @@ Don't silently fill in ambiguous requirements. The spec's entire purpose is to s
 
 **Write a spec document covering these six core areas:**
 
-1. **Objective** — What are we building and why? Who is the user? What does success look like?
+1. **Objective** — What are we building and why? Who is the user? What does success look like? If Figma designs are provided, deep-extract annotations (search `data-development-annotations` in code output): use `get_metadata` to scan the node tree, then `get_design_context` on each major section (not just top-level). List all annotations in a dedicated **Annotations** section in the spec — if an annotation contains a link, follow it and summarize. The human decides which annotations are in scope at spec approval.
 
 2. **Commands** — Full executable commands with flags, not just tool names.
    ```
@@ -86,6 +86,7 @@ Don't silently fill in ambiguous requirements. The spec's entire purpose is to s
 
 ## Objective
 [What we're building and why. User stories or acceptance criteria.]
+[If Figma: list all annotations as requirements here.]
 
 ## Tech Stack
 [Framework, language, key dependencies with versions]
@@ -106,6 +107,11 @@ Don't silently fill in ambiguous requirements. The spec's entire purpose is to s
 - Always: [...]
 - Ask first: [...]
 - Never: [...]
+
+## Figma Annotations (if applicable)
+[List every annotation found via data-development-annotations, with node ID and content.]
+[If annotation contains a link, include the link + summary of its content.]
+[Human: please confirm which annotations are in scope for this iteration.]
 
 ## Success Criteria
 [How we'll know this is done — specific, testable conditions]

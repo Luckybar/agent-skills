@@ -96,16 +96,28 @@ Proceeding automatically unless blocked.
 Input includes Figma URL or design references?
     │
     ├── YES → Visual review mode: ON
-    │   Read design with get_design_context — ⚠️ annotations are critical, always read them
-    │   Phase 1 Spec: include Figma URL → nodeId mapping per page/component
-    │                 extract and list all annotations (design intent, constraints, interaction specs)
-    │   Phase 2 Plan: tag each UI task with its Figma nodeId + relevant annotations
-    │   Phase 4 Build: add VISUAL REVIEWER to the subagent loop
-    │                  require mock data in every UI task
-    │                  pass annotations to implementer as requirements
+    │   Deep-extract annotations (see protocol below)
+    │   Phase 1 Spec: Figma URL → nodeId mapping + all annotations listed prominently
+    │                 annotation 含連結時（如 Figma Make prototype），跟進連結讀取內容
+    │                 在 Spec 中獨立列出 Annotations 區塊，交由人在 spec approval 時決定 scope
+    │   Phase 2 Plan: tag each UI task with Figma nodeId + relevant annotations
+    │   Phase 4 Build: VISUAL REVIEWER in subagent loop
+    │                  mock data required for every UI task
+    │                  annotations passed to implementer as requirements
     │
     └── NO  → Visual review mode: OFF (standard flow)
 ```
+
+**Annotation 深度提取：** Annotations 藏在 `get_design_context` 回傳 code 的 `data-development-annotations` 屬性中。頂層 code 被截斷時深層 annotations 會遺漏。
+
+```
+1. get_metadata → 記錄所有子區塊 nodeId
+2. get_design_context(頂層) → 搜尋 data-development-annotations 屬性
+3. 若 code 被截斷 → 對主要子區塊逐一呼叫（excludeScreenshot: true）
+4. 彙整所有 annotations → nodeId | 名稱 | 內容
+```
+
+（完整協議見 `figma-visual-review` Step 1a）
 
 **Refactoring/rewriting detection:** If the input involves refactoring, rewriting, or migrating an existing system, inventory all reference sources and choose the consulting mode:
 
@@ -217,15 +229,12 @@ TASK:
 
 CONTEXT:
 <where this fits in the project, relevant file paths>
-
-FIGMA ANNOTATIONS (if UI task):
-<paste all annotations from get_design_context — these are critical requirements>
+<if UI task with Figma: paste in-scope annotations from spec>
 
 RULES:
 - Follow TDD: write a failing test FIRST, then implement to make it pass
 - Commit after each meaningful change
 - [If visual review ON] Include mock data for all UI elements
-- [If Figma annotations exist] Treat annotations as hard requirements — they contain design intent, interaction specs, and constraints
 
 TEST COMMAND: <npm test / cargo test / etc.>
 
@@ -412,6 +421,7 @@ Everything else: make the reasonable choice, document it, keep going.
 | "I'll implement it myself instead of dispatching subagents" | NO. Every task in Phase 4 MUST be dispatched via Agent(), no matter how small — even a one-line change. Subagents get fresh context; your context is accumulating the entire pipeline. Dispatch. |
 | "This task is too small for a subagent" | There is no such thing. The rule is absolute: all implementation work goes through Agent(). A 30-second dispatch is cheaper than a controller that drifts into writing code. |
 | "The spec is obvious, I'll skip to planning" | The spec is the human's checkpoint. Skipping it means the human never approved what you're building. |
+| "I'll quietly skip this annotation" | Annotations must always be surfaced in the Spec's Annotations section — never silently omitted. The human decides at spec approval which ones are in scope. If an annotation has a link, follow it so the spec has full context. |
 | "I'll skip the spec review, the implementer's tests pass" | Tests verify behavior. Spec review verifies completeness. An implementer can pass all tests while missing a requirement. |
 | "I'll do one big commit at the end" | Per-task commits make it possible to revert individual changes. One commit is an all-or-nothing gamble. |
 | "This is too complex to do autonomously" | Break it smaller. If a single task is too complex, it needs decomposition, not human hand-holding. |

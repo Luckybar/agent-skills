@@ -126,7 +126,7 @@ Spawn a subagent using the `implementer-prompt.md` template. Provide:
 - Scene-setting context: where this fits in the overall project
 - Relevant file paths and patterns from the codebase
 - The test command to use
-- **If Figma task:** all annotations from the design (annotations contain design intent, interaction specs, constraints — they are critical requirements, not optional notes)
+- **If Figma task:** all in-scope annotations from the design (as determined at spec approval)
 
 The implementer must:
 - Follow `test-driven-development` — write failing test first, then implement

@@ -97,19 +97,45 @@ Pipeline 模式下 visual reviewer 本身就是 subagent（fresh context），�
 
 ### Step 1：收集比對資料
 
-**1a. 取得 Figma 設計結構（輕量優先）**
+**1a. 取得 Figma 設計結構 + 深度提取 annotations**
 
 從 Figma URL 解析 `fileKey` 和 `nodeId`：
 - `figma.com/design/:fileKey/:fileName?node-id=:nodeId` → 將 nodeId 中的 `-` 轉為 `:`
 
+`get_design_context` 只回傳**你指定的那個節點**的資料。如果 annotations 在子節點上，頂層呼叫不會拿到它們。必須多層掃描：
+
 ```
-1. get_metadata(fileKey, nodeId) → 節點結構（輕量，用於規劃比對區塊）
-2. get_design_context(fileKey, nodeId) → 取得設計資料，⚠️ 特別注意 annotations
-3. 規劃比對清單：哪些子節點需要逐一比對
-4. ⚠️ 不要一次取所有截圖。等 Step 2-4 逐一比對時再取
+Annotation 深度提取協議：
+
+背景：annotations 在 get_design_context 回傳的 code 中以
+`data-development-annotations="..."` 屬性出現。get_metadata 不會回傳 annotations。
+如果頂層節點的 code 太大被截斷，深層 annotations 就會遺漏。
+
+1. get_metadata(fileKey, nodeId)
+   → 取得完整節點樹（輕量：只有 name, type, id, position）
+   → 記錄所有主要子區塊的 nodeId（Section / Frame / Component）
+
+2. get_design_context(fileKey, nodeId)
+   → 頂層設計資料
+   → 在回傳的 code 中搜尋 data-development-annotations 屬性
+   → 記錄找到的每一條 annotation（節點 ID + 內容）
+
+3. 檢查頂層回傳是否完整（code 有沒有被截斷或省略子節點）
+   → 完整 → 頂層已涵蓋所有 annotations，跳到 Step 5
+   → 截斷/省略 → 繼續 Step 4
+
+4. 對每個主要子區塊逐一呼叫（excludeScreenshot: true 節省 context）：
+   get_design_context(fileKey, childNodeId, excludeScreenshot: true)
+   → 搜尋 data-development-annotations
+   → 記錄新發現的 annotations
+   → 連續兩個子區塊都沒有新 annotation → 停止下探
+
+5. 彙整所有 annotations → 產出完整清單
+   格式：nodeId | 節點名稱 | annotation 內容
+   → 有 annotation 的元件列為優先比對項目
 ```
 
-**⚠️ Annotations 是高優先項目：** Figma 設計稿中的 annotation（設計師留下的標記/備註）都是重要資訊，包含設計意圖、互動規格、邊界條件等。在 `get_design_context` 回傳結果中看到 annotations 時，必須逐條閱讀並作為比對標準。有 annotation 的元件應優先比對。
+**⚠️ 不要一次取所有截圖。** 等 Step 2-4 逐一比對時再取。
 
 **1b. 截取瀏覽器實際畫面**
 
@@ -148,7 +174,8 @@ Pipeline 模式下 visual reviewer 本身就是 subagent（fresh context），�
 ```
 ### 元件級比對清單
 
-- [ ] **Annotations**：設計師標記的備註、互動規格、邊界條件（有 annotation 必看，最高優先）
+**先查 in-scope annotations：** 有 annotation 的元件優先比對。annotation 內容是否為驗收標準，取決於 spec approval 時人的決定。
+
 - [ ] **字體**：font-family、font-size、font-weight、line-height
 - [ ] **顏色**：文字色、背景色、邊框色是否精確匹配
 - [ ] **間距**：元件內部 padding、元素間 gap
@@ -333,7 +360,7 @@ Input 包含 Figma URL？
 ## Red Flags
 
 - 跳過截圖比對，只看 code 就說「匹配」
-- 忽略 Figma annotations — 有 annotation 的元件是設計師特別標記的，必須閱讀並遵循
+- 沒有讀取或忽略 Figma annotations（設計師特別標記的意圖與規格）
 - 沒有用 `get_design_context` 驗證具體數值（色碼、px），只靠視覺感覺
 - Builder 沒有填入 mock data 就送審
 - 修正循環超過 3 輪仍未收斂，但沒有升級給人工

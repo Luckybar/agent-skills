@@ -29,6 +29,7 @@ Before writing any code, operate in read-only mode:
 - Identify existing patterns and conventions
 - Map dependencies between components
 - Note risks and unknowns
+- **If Figma designs are referenced:** read with `get_design_context`, map in-scope annotations (from spec approval) to acceptance criteria in the corresponding task
 
 **Do NOT write code during planning.** The output is a plan document, not implementation.
 
@@ -88,6 +89,10 @@ Each task follows this structure:
 **Acceptance criteria:**
 - [ ] [Specific, testable condition]
 - [ ] [Specific, testable condition]
+
+**Figma annotations** (if UI task with Figma):
+- [ ] [Annotation text → translated into testable requirement]
+- [ ] [Annotation text → translated into testable requirement]
 
 **Verification:**
 - [ ] Tests pass: `npm test -- --grep "feature-name"`
