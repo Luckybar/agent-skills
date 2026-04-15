@@ -45,6 +45,11 @@ Skills also activate automatically based on what you're doing — designing an A
 /plugin install agent-skills@addy-agent-skills
 ```
 
+> **SSH errors?** The marketplace clones repos via SSH. If you don't have SSH keys set up on GitHub, either [add your SSH key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account) or switch to HTTPS for fetches only:
+> ```bash
+> git config --global url."https://github.com/".insteadOf "git@github.com:"
+> ```
+
 **Local / development:**
 
 ```bash
@@ -88,10 +93,24 @@ Add skill contents to your Windsurf rules configuration. See [docs/windsurf-setu
 </details>
 
 <details>
+<summary><b>OpenCode</b></summary>
+
+Uses agent-driven skill execution via AGENTS.md and the `skill` tool.
+
+See [docs/opencode-setup.md](docs/opencode-setup.md).
+
+</details>
+
+<details>
 <summary><b>GitHub Copilot</b></summary>
 
 Use agent definitions from `agents/` as Copilot personas and skill content in `.github/copilot-instructions.md`. See [docs/copilot-setup.md](docs/copilot-setup.md).
 
+</details>
+
+<details>
+  <summary><b>Kiro IDE & CLI </b></summary>
+  Skills for Kiro reside under ".kiro/skills/" and can be stored under Project or Global level. Kiro also supports Agents.md. See Kiro docs at https://kiro.dev/docs/skills/
 </details>
 
 <details>
@@ -101,11 +120,13 @@ Skills are plain Markdown - they work with any agent that accepts system prompts
 
 </details>
 
+
+
 ---
 
-## All 19 Skills
+## All 20 Skills
 
-The commands above are the entry points. Under the hood, they activate these 19 skills — each one a structured workflow with steps, verification gates, and anti-rationalization tables. You can also reference any skill directly.
+The commands above are the entry points. Under the hood, they activate these 20 skills — each one a structured workflow with steps, verification gates, and anti-rationalization tables. You can also reference any skill directly.
 
 ### Define - Clarify what to build
 
@@ -127,6 +148,7 @@ The commands above are the entry points. Under the hood, they activate these 19 
 | [incremental-implementation](skills/incremental-implementation/SKILL.md) | Thin vertical slices - implement, test, verify, commit. Feature flags, safe defaults, rollback-friendly changes | Any change touching more than one file |
 | [test-driven-development](skills/test-driven-development/SKILL.md) | Red-Green-Refactor, test pyramid (80/15/5), test sizes, DAMP over DRY, Beyonce Rule, browser testing | Implementing logic, fixing bugs, or changing behavior |
 | [context-engineering](skills/context-engineering/SKILL.md) | Feed agents the right information at the right time - rules files, context packing, MCP integrations | Starting a session, switching tasks, or when output quality drops |
+| [source-driven-development](skills/source-driven-development/SKILL.md) | Ground every framework decision in official documentation - verify, cite sources, flag what's unverified | You want authoritative, source-cited code for any framework or library |
 | [frontend-ui-engineering](skills/frontend-ui-engineering/SKILL.md) | Component architecture, design systems, state management, responsive design, WCAG 2.1 AA accessibility | Building or modifying user-facing interfaces |
 | [api-and-interface-design](skills/api-and-interface-design/SKILL.md) | Contract-first design, Hyrum's Law, One-Version Rule, error semantics, boundary validation | Designing APIs, module boundaries, or public interfaces |
 
@@ -218,12 +240,13 @@ Every skill follows a consistent anatomy:
 
 ```
 agent-skills/
-├── skills/                            # 19 core skills (SKILL.md per directory)
+├── skills/                            # 20 core skills (SKILL.md per directory)
 │   ├── idea-refine/                   #   Define
 │   ├── spec-driven-development/       #   Define
 │   ├── planning-and-task-breakdown/   #   Plan
 │   ├── incremental-implementation/    #   Build
 │   ├── context-engineering/           #   Build
+│   ├── source-driven-development/     #   Build
 │   ├── frontend-ui-engineering/       #   Build
 │   ├── test-driven-development/       #   Build
 │   ├── api-and-interface-design/      #   Build
