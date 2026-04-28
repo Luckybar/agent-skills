@@ -90,6 +90,7 @@ description: Figma 視覺比對 agent — 將建置結果與 Figma 設計稿進�
 ### Pipeline 模式策略
 
 Pipeline 模式下 visual reviewer 本身就是 subagent（fresh context），天然不會有 context 壓力。但仍應遵守：
+- **Annotations 不重新提取** — Pipeline 模式下 annotations 已在 spec 階段提取完畢，controller 會在 prompt 中傳入。不需再呼叫 `get_design_context` 做 annotation 掃描，直接使用傳入的 annotation 清單。Step 1a 的深度提取協議僅適用於 standalone 模式
 - 每個區塊比對完只保留文字報告
 - SendMessage 回報時發送文字差異清單，不要附截圖
 

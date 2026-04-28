@@ -75,13 +75,13 @@ The controller is **opus** (default). Subagents that need a different model **MU
 | **Implementer** (straightforward) | **sonnet** | `model: "sonnet"` | Clear spec + TDD — follows instructions efficiently |
 | **Implementer** (complex) | opus | *(omit — inherits)* | Deep reasoning for architecture and edge cases |
 | **Spec Reviewer** | **sonnet** | `model: "sonnet"` | Reads code and verifies against acceptance criteria |
-| **Visual Reviewer** | **haiku** | `model: "haiku"` | Screenshot comparison following a structured checklist |
-| **Browser Tester** | **haiku** | `model: "haiku"` | Follows a rigid test script — low judgment needed |
+| **Visual Reviewer** | opus | *(omit — inherits)* | Screenshot comparison + design judgment |
+| **Browser Tester** | opus | *(omit — inherits)* | Runtime verification with full reasoning |
 | **Code Quality Reviewer** | **sonnet** | `model: "sonnet"` | Evaluates readability, architecture, test quality |
 | **Legacy Consultant** | opus | *(omit — inherits)* | Deep analysis of business logic, cross-referencing sources |
 | **Final Cross-Task Reviewer** | opus | *(omit — inherits)* | Holistic review across all changes |
 
-**Rule:** If the table says `model: "sonnet"` or `model: "haiku"`, you MUST pass that parameter. If it says *(omit — inherits)*, do NOT pass `model` — the subagent inherits opus from the controller.
+**Rule:** If the table says `model: "sonnet"`, you MUST pass that parameter. If it says *(omit — inherits)*, do NOT pass `model` — the subagent inherits opus from the controller.
 
 **How to judge "straightforward" vs "complex" for implementer tasks:**
 - **Straightforward (→ sonnet):** CRUD operations, UI components with clear design, adding a field/endpoint, writing tests for existing logic, config changes
@@ -165,13 +165,11 @@ The spec reviewer must:
 - Check for missing requirements
 - Report: `APPROVED`, `NEEDS_FIXES` (with specific list), or `MAJOR_ISSUES`
 
-If `NEEDS_FIXES`: re-dispatch implementer with the fix list. Then re-run spec review. Max 3 cycles.
+If `NEEDS_FIXES`: re-dispatch implementer with the fix list. Then re-run spec review. Max 2 cycles.
 
 #### 2c. Dispatch Visual Reviewer (Optional — UI tasks with Figma)
 
-**→** `Agent({model: "haiku", ...})`
-
-Only for tasks that have a Figma nodeId mapping. Runs after spec review passes. Follows the `figma-visual-review` skill process.
+Only for tasks that have a Figma nodeId mapping. Runs after spec review passes. Follows the `figma-visual-review` skill process. The visual reviewer receives pre-extracted annotations from the spec — it does NOT re-call `get_design_context` for annotation extraction.
 
 The visual reviewer uses **team mode** (SendMessage) to communicate with the implementer in real-time:
 
@@ -205,8 +203,6 @@ Visual Reviewer activated
 - Mock data in dedicated fixture/seed files for easy replacement
 
 #### 2d. Dispatch Browser Tester (All UI Tasks)
-
-**→** `Agent({model: "haiku", ...})`
 
 Runs on every task that produces UI output (pages, components with routes). Unlike visual review (Figma-dependent), browser testing always runs for UI tasks. Follows the `chrome-smoke-test` skill process.
 
@@ -260,7 +256,7 @@ The quality reviewer checks:
 
 Report: `APPROVED`, `SUGGESTIONS` (non-blocking), or `NEEDS_FIXES`
 
-If `NEEDS_FIXES`: re-dispatch implementer. Re-run quality review. Max 2 cycles.
+If `NEEDS_FIXES`: re-dispatch implementer. Re-run quality review. Max 1 cycle.
 
 #### 2f. Mark Task Complete
 
@@ -299,9 +295,10 @@ Issues for human review:
 2. **Paste task text into subagent prompts.** Never tell a subagent "read task 3 from the plan file." The subagent has fresh context — give it everything it needs.
 3. **Don't do the implementer's job.** The controller dispatches and coordinates. If you catch yourself writing implementation code, stop — spawn a subagent instead.
 4. **Trust the reviewers, not the implementer.** The implementer is optimistic by nature. The reviewers verify independently.
-5. **Cap review cycles.** Spec review: max 3 cycles. Quality review: max 2 cycles. If still failing, escalate to human.
-6. **Pass `model` when the subagent needs a different model than the controller (opus).** Check the Model Assignment table — if it says `model: "sonnet"` or `model: "haiku"`, you MUST include it in the Agent() call. If it says *(omit — inherits)*, do not pass `model`. Forgetting to pass `model` on a sonnet/haiku role wastes cost; passing it unnecessarily on an opus role is harmless but noisy.
+5. **Cap review cycles.** Spec review: max 2 cycles. Quality review: max 1 cycle. If still failing, escalate to human.
+6. **Pass `model: "sonnet"` only for sonnet roles.** Check the Model Assignment table — sonnet roles MUST include `model` in the Agent() call. All other roles inherit opus — do not pass `model`.
 7. **Route legacy questions to the consultant, not the human.** When an implementer reports NEEDS_CONTEXT about the old system, dispatch the legacy consultant first. Only escalate to the human if the consultant can't answer (e.g., requires production config or business decisions).
+8. **Summarize and discard after each task.** After a task's full review cycle completes, retain only a one-line summary (e.g., "T1: DONE, 1 spec-review cycle"). Discard full subagent reports from context. This prevents the controller from accumulating unbounded context across tasks.
 
 ## Common Rationalizations
 
@@ -317,7 +314,7 @@ Issues for human review:
 
 ## Red Flags
 
-- **Dispatching a sonnet/haiku subagent without `model` parameter** — check the Model Assignment table; if it says `model: "sonnet"` or `model: "haiku"`, the Agent() call MUST include it
+- **Dispatching a sonnet subagent without `model: "sonnet"`** — check the Model Assignment table; sonnet roles MUST include `model` in the Agent() call
 - Controller writing implementation code instead of dispatching
 - Skipping spec review because implementer "seems confident"
 - Skipping quality review to save time
