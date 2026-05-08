@@ -45,9 +45,10 @@ Skills also activate automatically based on what you're doing — designing an A
 /plugin install agent-skills@addy-agent-skills
 ```
 
-> **SSH errors?** The marketplace clones repos via SSH. If you don't have SSH keys set up on GitHub, either [add your SSH key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account) or switch to HTTPS for fetches only:
+> **SSH errors?** The marketplace clones repos via SSH. If you don't have SSH keys set up on GitHub, either [add your SSH key](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account) or use the full HTTPS URL to force the HTTPS cloning:
 > ```bash
-> git config --global url."https://github.com/".insteadOf "git@github.com:"
+> /plugin marketplace add https://github.com/addyosmani/agent-skills.git
+> /plugin install agent-skills@addy-agent-skills
 > ```
 
 **Local / development:**
@@ -210,21 +211,21 @@ Quick-reference material that skills pull in when needed:
 Every skill follows a consistent anatomy:
 
 ```
-┌─────────────────────────────────────────────┐
-│  SKILL.md                                   │
-│                                             │
-│  ┌─ Frontmatter ─────────────────────────┐  │
-│  │ name: lowercase-hyphen-name           │  │
-│  │ description: Use when [trigger]       │  │
-│  └───────────────────────────────────────┘  │
-│                                             │
-│  Overview         → What this skill does    │
-│  When to Use      → Triggering conditions   │
-│  Process          → Step-by-step workflow   │
-│  Rationalizations → Excuses + rebuttals     │
-│  Red Flags        → Signs something's wrong │
-│  Verification     → Evidence requirements   │
-└─────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────┐
+│  SKILL.md                                       │
+│                                                 │
+│  ┌─ Frontmatter ─────────────────────────────┐  │
+│  │ name: lowercase-hyphen-name               │  │
+│  │ description: Guides agents through [task].│  │
+│  │              Use when…                    │  │
+│  └───────────────────────────────────────────┘  │                                                                                                
+│  Overview         → What this skill does        │
+│  When to Use      → Triggering conditions       │
+│  Process          → Step-by-step workflow       │
+│  Rationalizations → Excuses + rebuttals         │
+│  Red Flags        → Signs something's wrong     │
+│  Verification     → Evidence requirements       │
+└─────────────────────────────────────────────────┘
 ```
 
 **Key design choices:**
@@ -265,7 +266,8 @@ agent-skills/
 ├── agents/                            # 3 specialist personas
 ├── references/                        # 4 supplementary checklists
 ├── hooks/                             # Session lifecycle hooks
-├── .claude/commands/                  # 7 slash commands
+├── .claude/commands/                  # 7 slash commands (Claude Code)
+├── .gemini/commands/                  # 7 slash commands (Gemini CLI)
 └── docs/                              # Setup guides per tool
 ```
 
