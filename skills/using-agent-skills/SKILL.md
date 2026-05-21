@@ -16,8 +16,9 @@ When a task arrives, identify the development phase and apply the corresponding 
 ```
 Task arrives
     │
-    ├── Want full auto (spec→ship)? ──→ autonomous-pipeline
-    ├── Vague idea/need refinement? ──→ idea-refine
+    ├── Want full auto (spec→ship)? ────────→ autonomous-pipeline
+    ├── Don't know what you want yet? ──────→ interview-me
+    ├── Have a rough concept, need variants? → idea-refine
     ├── New project/feature/change? ──→ spec-driven-development
     ├── Have a spec, need tasks? ──────→ planning-and-task-breakdown
     ├── Refactoring/rewriting? ────────→ autonomous-pipeline (with consulting)
@@ -30,7 +31,8 @@ Task arrives
     │   │   └── Has Figma design? ──→ + figma-visual-review
     │   ├── API work? ────────────────→ api-and-interface-design
     │   ├── Need better context? ─────→ context-engineering
-    │   └── Need doc-verified code? ───→ source-driven-development
+    │   ├── Need doc-verified code? ───→ source-driven-development
+    │   └── Stakes high / unfamiliar code? ──→ doubt-driven-development
     ├── Writing/running tests? ────────→ test-driven-development
     │   ├── Browser-based? ───────────→ browser-testing-with-devtools
     │   └── UI smoke test? ──────────→ chrome-smoke-test
@@ -168,19 +170,21 @@ These are the subtle errors that look like productivity but create problems:
 For a complete feature, the typical skill sequence is:
 
 ```
-1. idea-refine                     → Refine vague ideas
-2. spec-driven-development         → Define what we're building
-3. planning-and-task-breakdown     → Break into verifiable chunks
-4. context-engineering             → Load the right context
-5. source-driven-development       → Verify against official docs
-6. using-git-worktrees             → Isolate work in a clean branch
-7. subagent-driven-development     → Implement with adversarial review
-   (or incremental-implementation  → Build slice by slice, single-agent)
-8. test-driven-development         → Prove each slice works
-9. code-review-and-quality         → Review before merge
-10. git-workflow-and-versioning    → Clean commit history
-11. documentation-and-adrs         → Document decisions
-12. shipping-and-launch            → Deploy safely
+1.  interview-me                  → Extract what the user actually wants
+2.  idea-refine                   → Refine vague ideas
+3.  spec-driven-development       → Define what we're building
+4.  planning-and-task-breakdown   → Break into verifiable chunks
+5.  context-engineering           → Load the right context
+6.  source-driven-development     → Verify against official docs
+7.  using-git-worktrees           → Isolate work in a clean branch
+8.  subagent-driven-development   → Implement with adversarial review
+    (or incremental-implementation → Build slice by slice, single-agent)
+9.  doubt-driven-development      → Cross-examine non-trivial decisions in-flight
+10. test-driven-development       → Prove each slice works
+11. code-review-and-quality       → Review before merge
+12. git-workflow-and-versioning   → Clean commit history
+13. documentation-and-adrs        → Document decisions
+14. shipping-and-launch           → Deploy safely
 ```
 
 Or use `autonomous-pipeline` (/auto) to chain steps 2–7 automatically.
@@ -192,6 +196,7 @@ Not every task needs every skill. A bug fix might only need: `debugging-and-erro
 | Phase | Skill | One-Line Summary |
 |-------|-------|-----------------|
 | Auto | autonomous-pipeline | Full lifecycle in one run — spec through reviewed code |
+| Define | interview-me | Surface what the user actually wants before any plan, spec, or code exists |
 | Define | idea-refine | Refine ideas through structured divergent and convergent thinking |
 | Define | spec-driven-development | Requirements and acceptance criteria before code |
 | Plan | planning-and-task-breakdown | Decompose into small, verifiable tasks |
@@ -200,6 +205,7 @@ Not every task needs every skill. A bug fix might only need: `debugging-and-erro
 | Build | using-git-worktrees | Isolated branch/directory for safe implementation |
 | Build | team-consulting | Persistent specialist agents for complex refactoring with 4+ sources |
 | Build | source-driven-development | Verify against official docs before implementing |
+| Build | doubt-driven-development | Adversarial fresh-context review of every non-trivial decision |
 | Build | context-engineering | Right context at the right time |
 | Build | frontend-ui-engineering | Production-quality UI with accessibility |
 | Build | api-and-interface-design | Stable interfaces with clear contracts |
