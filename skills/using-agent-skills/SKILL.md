@@ -38,10 +38,12 @@ Task arrives
     │   └── UI smoke test? ──────────→ chrome-smoke-test
     ├── Something broke? ──────────────→ debugging-and-error-recovery
     ├── Reviewing code? ───────────────→ code-review-and-quality
+    │   ├── Too complex? ─────────────→ code-simplification
     │   ├── Security concerns? ───────→ security-and-hardening
     │   └── Performance concerns? ────→ performance-optimization
     ├── Committing/branching? ─────────→ git-workflow-and-versioning
     ├── CI/CD pipeline work? ──────────→ ci-cd-and-automation
+    ├── Deprecating/migrating? ────────→ deprecation-and-migration
     ├── Writing docs/ADRs? ───────────→ documentation-and-adrs
     └── Deploying/launching? ─────────→ shipping-and-launch
 ```
@@ -159,7 +161,7 @@ These are the subtle errors that look like productivity but create problems:
 
 2. **Skills are workflows, not suggestions.** Follow the steps in order. Don't skip verification steps.
 
-3. **Multiple skills can apply.** A feature implementation might involve `idea-refine` → `spec-driven-development` → `planning-and-task-breakdown` → `incremental-implementation` → `test-driven-development` → `code-review-and-quality` → `shipping-and-launch` in sequence.
+3. **Multiple skills can apply.** A feature implementation might involve `idea-refine` → `spec-driven-development` → `planning-and-task-breakdown` → `incremental-implementation` → `test-driven-development` → `code-review-and-quality` → `code-simplification` → `shipping-and-launch` in sequence.
 
 4. **When in doubt, start with a spec.** If the task is non-trivial and there's no spec, begin with `spec-driven-development`.
 
@@ -182,9 +184,11 @@ For a complete feature, the typical skill sequence is:
 9.  doubt-driven-development      → Cross-examine non-trivial decisions in-flight
 10. test-driven-development       → Prove each slice works
 11. code-review-and-quality       → Review before merge
-12. git-workflow-and-versioning   → Clean commit history
-13. documentation-and-adrs        → Document decisions
-14. shipping-and-launch           → Deploy safely
+12. code-simplification           → Reduce unnecessary complexity while preserving behavior
+13. git-workflow-and-versioning   → Clean commit history
+14. documentation-and-adrs        → Document decisions
+15. deprecation-and-migration     → Retire old systems and move users safely when needed
+16. shipping-and-launch           → Deploy safely
 ```
 
 Or use `autonomous-pipeline` (/auto) to chain steps 2–7 automatically.
@@ -215,9 +219,11 @@ Not every task needs every skill. A bug fix might only need: `debugging-and-erro
 | Verify | chrome-smoke-test | Console, RWD, network, interaction, a11y testing via Chrome |
 | Verify | debugging-and-error-recovery | Reproduce → localize → fix → guard |
 | Review | code-review-and-quality | Five-axis review with quality gates |
+| Review | code-simplification | Preserve behavior while reducing unnecessary complexity |
 | Review | security-and-hardening | OWASP prevention, input validation, least privilege |
 | Review | performance-optimization | Measure first, optimize only what matters |
 | Ship | git-workflow-and-versioning | Atomic commits, clean history |
 | Ship | ci-cd-and-automation | Automated quality gates on every change |
+| Ship | deprecation-and-migration | Remove old systems and migrate users safely |
 | Ship | documentation-and-adrs | Document the why, not just the what |
 | Ship | shipping-and-launch | Pre-launch checklist, monitoring, rollback plan |
